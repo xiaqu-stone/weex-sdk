@@ -89,7 +89,7 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$support"
     implementation "com.android.support:recyclerview-v7:$support"
     implementation "com.android.support:support-v4:$support"
-    implementation "com.alibaba:fastjson:1.1.46.android"
+    implementation "com.alibaba:fastjson:$fastjson"
 
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.hamcrest:hamcrest-core:1.3'
@@ -117,7 +117,7 @@ ext {
     libraryName = 'weex-sdk'
     artifact = 'weex-sdk'
 
-    libraryVersion = '1.0.0'
+    libraryVersion = '1.0.1'
 
     libraryDescription = 'Weex SDK 的再打包'
 
