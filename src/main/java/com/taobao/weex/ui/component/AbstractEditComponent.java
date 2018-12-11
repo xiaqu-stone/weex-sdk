@@ -211,27 +211,14 @@ public abstract class AbstractEditComponent extends WXComponent<WXEditText> {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-          if (mIgnoreNextOnInputEvent) {
-            mIgnoreNextOnInputEvent = false;
-          }
-
           if (mBeforeText.equals(s.toString())) {
             return;
           }
 
+          String event = getDomObject().getEvents().contains(Constants.Event.INPUT) ? Constants.Event.INPUT : null;
+          fireEvent(event, s.toString());
+
           mBeforeText = s.toString();
-
-          if (getDomObject() != null && getDomObject().getAttrs() != null) {
-            Object val = getDomObject().getAttrs().get(Constants.Name.VALUE);
-            String valString = WXUtils.getString(val, null);
-            if (mBeforeText != null && mBeforeText.equals(valString)) {
-              return;
-            }
-          }
-
-          if (!mIgnoreNextOnInputEvent) {
-            fireEvent(Constants.Event.INPUT, s.toString());
-          }
         }
 
         @Override

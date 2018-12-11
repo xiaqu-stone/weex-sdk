@@ -117,9 +117,9 @@ ext {
     libraryName = 'weex-sdk'
     artifact = 'weex-sdk'
 
-    libraryVersion = '1.0.1'
+    libraryVersion = '1.0.2'
 
-    libraryDescription = 'Weex SDK 的再打包'
+    libraryDescription = 'Weex SDK 的再打包,基于官方0.9.4版本'
 
     siteUrl = 'https://github.com/xiaqu-stone/weex-sdk'
     gitUrl = 'https://github.com/xiaqu-stone/weex-sdk.git'

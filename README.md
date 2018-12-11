@@ -3,12 +3,12 @@
 
 ## 说明
 
-适配项目应用的再打包
+适配项目应用的再打包,基于官方 `0.9.4`
 
 ### gradle
 
 ```
-implementation "com.stone.kuainiugroup:weex-sdk:1.0.1"
+implementation "com.stone.kuainiugroup:weex-sdk:1.0.2"
 ```
 
 ### Proguard
