@@ -43,7 +43,7 @@ android {
         buildConfigField "long", "X86_Size", "${X86_Size}"
         buildConfigField "String", "buildJavascriptFrameworkVersion", "\"${jsfmVersion}\""
         buildConfigField "String", "buildVersion", "\"${version}\""
-        minSdkVersion conf.minSdkVersion
+        minSdkVersion 15
         targetSdkVersion conf.targetSdkVersion
         versionCode 1
         versionName "1.0"
@@ -117,7 +117,7 @@ ext {
     libraryName = 'weex-sdk'
     artifact = 'weex-sdk'
 
-    libraryVersion = '1.0.2'
+    libraryVersion = '1.0.3'
 
     libraryDescription = 'Weex SDK 的再打包,基于官方0.9.4版本'
 

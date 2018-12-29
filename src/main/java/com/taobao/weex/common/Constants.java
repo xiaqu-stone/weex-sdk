@@ -231,6 +231,7 @@ public class Constants {
     String HIDDEN = "hidden";
     String TEXT = "text";
     String PASSWORD = "password";
+    String PASSWORD_SHOW = "password-show";
     String TEL = "tel";
     String EMAIL = "email";
     String URL = "url";

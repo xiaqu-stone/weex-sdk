@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -18,24 +18,22 @@
  */
 package com.taobao.weex.ui.view;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.net.http.SslError;
+import android.os.Build;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
 import android.view.View;
-import android.webkit.SslErrorHandler;
-import android.webkit.WebChromeClient;
-import android.webkit.WebResourceError;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.webkit.*;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
-
+import android.widget.Toast;
 import com.taobao.weex.utils.WXLogUtils;
 
 public class WXWebView implements IWebView {
@@ -89,28 +87,28 @@ public class WXWebView implements IWebView {
 
     @Override
     public void loadUrl(String url) {
-        if(getWebView() == null)
+        if (getWebView() == null)
             return;
         getWebView().loadUrl(url);
     }
 
     @Override
     public void reload() {
-        if(getWebView() == null)
+        if (getWebView() == null)
             return;
         getWebView().reload();
     }
 
     @Override
     public void goBack() {
-        if(getWebView() == null)
+        if (getWebView() == null)
             return;
         getWebView().goBack();
     }
 
     @Override
     public void goForward() {
-        if(getWebView() == null)
+        if (getWebView() == null)
             return;
         getWebView().goForward();
     }
@@ -147,7 +145,8 @@ public class WXWebView implements IWebView {
         mWebView.setVisibility(shown ? View.VISIBLE : View.INVISIBLE);
     }
 
-    private @Nullable WebView getWebView() {
+    private @Nullable
+    WebView getWebView() {
         //TODO: remove this, duplicate with getView semantically.
         return mWebView;
     }
@@ -155,11 +154,23 @@ public class WXWebView implements IWebView {
     private void initWebView(WebView wv) {
         WebSettings settings = wv.getSettings();
         settings.setJavaScriptEnabled(true);
+        settings.setAllowFileAccess(true);
         settings.setAppCacheEnabled(true);
         settings.setUseWideViewPort(true);
         settings.setDomStorageEnabled(true);
         settings.setSupportZoom(false);
         settings.setBuiltInZoomControls(false);
+        settings.setGeolocationEnabled(true);
+        settings.setDatabaseEnabled(true);
+        // TODO: 2018/12/28 增加几种WebView设置：混合加载模式等
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            wv.removeJavascriptInterface("searchBoxJavaBridge_");
+            wv.removeJavascriptInterface("accessibility");
+            wv.removeJavascriptInterface("accessibilityTraversal");
+        }
         wv.setWebViewClient(new WebViewClient() {
 
             @Override
@@ -207,6 +218,8 @@ public class WXWebView implements IWebView {
             @Override
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
                 super.onReceivedSslError(view, handler, error);
+                // TODO: 2018/12/28 增加SSL处理 
+                handler.proceed();
                 if (mOnErrorListener != null) {
                     mOnErrorListener.onError("error", "ssl error");
                 }
@@ -231,6 +244,36 @@ public class WXWebView implements IWebView {
             }
 
         });
+        // TODO: 2018/12/28 WebView 增加下载监听 
+        wv.setDownloadListener((url, userAgent, contentDisposition, mimetype, contentLength) -> {
+            if (isActValid()) {
+                new AlertDialog.Builder(mContext).setTitle("提示")
+                        .setMessage("是否跳转浏览器去下载？")
+                        .setNegativeButton("取消", null)
+                        .setPositiveButton("确定", (dialog, which) -> {
+                            Uri uri = Uri.parse(url);
+                            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                            try {
+                                mContext.startActivity(intent);
+                            } catch (Exception e) {
+                                WXLogUtils.w("onDownloadStart: " + e.getMessage());
+                                Toast.makeText(mContext, "请安装浏览器后重试", Toast.LENGTH_SHORT).show();
+                            }
+                        }).show();
+            }
+        });
+    }
+
+    private boolean isActValid() {
+        if (mContext instanceof Activity) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                return !((Activity) mContext).isDestroyed();
+            } else {
+                return !((Activity) mContext).isFinishing();
+            }
+        } else {
+            return false;
+        }
     }
 
 }
