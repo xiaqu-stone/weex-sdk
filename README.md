@@ -8,7 +8,7 @@
 ### gradle
 
 ```
-implementation "com.stone.kuainiugroup:weex-sdk:1.0.2"
+implementation "com.stone.kuainiugroup:weex-sdk:1.0.3"
 ```
 
 ### Proguard
